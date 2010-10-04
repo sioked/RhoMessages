@@ -19,9 +19,12 @@ class LoginController < Rho::RhoController
   def do_login
     if @params['login']
       begin
-        Rho::AsyncHttp.get(
-          :url => 'http://www.edsiok.com/test.json',
-          :body => 'test',
+        @@user = @params['login']
+        Rho::AsyncHttp.post(
+          :url => 'http://kata.slalomdemo.com:60577/UserMessageService.asmx/ValidateUser',
+          :body => "{ 'userId' : '#{@params['login']}'}",
+          :headers => {"Authorization" => "Basic d2VidXNlcjpQYXNzQHdvcmQh",
+                      "Content-Type" => "application/json; charset=utf-8"},
           :callback => (url_for :action => :login_callback),
           :callback_param => "" )
         render :action => :wait
@@ -31,14 +34,24 @@ class LoginController < Rho::RhoController
       end
     else
       @msg = Rho::RhoError.err_message(Rho::RhoError::ERR_UNATHORIZED) unless @msg && @msg.length > 0
-      render :action => :login
+      WebView.navigate( url_for :action=>:login, :query => {:msg => @msg} )
     end
   end
   
   def login_callback
     puts "Got a response #{@params}"
-    @@get_result = @params['body']
-    WebView.navigate ( url_for :action => :response )
+    if @params['status'] == "ok"
+      @@get_result = @params['body']
+      if @@get_result['d'] == true
+        WebView.navigate( url_for :controller=>:Messages, :action=>:index, :query => {:user => @@user} )
+      else
+        @msg = "Login not recognized. Please try again"
+        WebView.navigate ( url_for :action => :login, :query => {:msg => @msg} )
+      end
+    else
+      @msg = "Error connecting to authentication service"
+      WebView.navigate ( url_for :action => :login, :query => {:msg => @msg} )
+    end
   end
   
   def get_res
