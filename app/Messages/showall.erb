@@ -1,0 +1,15 @@
+<div class="pageTitle">
+  <h1>Messages</h1>
+</div>
+
+
+<div class="toolbar">
+</div>
+
+<div class="content">
+  <ul>
+   <% @messages.each do |message| %>
+     <li><%= message["ShortText"] %></li>
+   <% end %>
+  </ul>
+</div>
