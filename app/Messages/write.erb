@@ -10,13 +10,15 @@
   <form method="POST" action="<%= url_for :action => :do_write %>">
     <% if @msg %>
         <p style="color: red"><%= @msg %></p>
+        
+    <% else %>
+      <ul>
+        <li>
+          <label for="message" class="fieldLabel">Message</label>
+          <input type="text" name="message" <%= placeholder("Your message") %> />
+        </li>
+      </ul>
+      <input type="submit" class="standardButton" value="Write"/>
     <% end %>
-    <ul>
-      <li>
-        <label for="message" class="fieldLabel">Message</label>
-        <input type="text" name="message" <%= placeholder("Your message") %> />
-      </li>
-    </ul>
-    <input type="submit" class="standardButton" value="Write"/>
   </form>
 </div>
